@@ -16,6 +16,7 @@ import javax.xml.xpath.XPathFactory;
 
 import objects.NewsBrief;
 
+import org.apache.commons.io.monitor.FileAlterationListener;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -23,6 +24,7 @@ import org.xml.sax.InputSource;
 
 public class RssParser {
 
+	private final int NEWS_NUM = 5;
 	private static XPath xPath = XPathFactory.newInstance().newXPath();
 	private static final String ITEM = "/rss/channel/item";
 	private static final String TITLE = "title/text()";
@@ -30,19 +32,20 @@ public class RssParser {
 	private static final String LINK = "link/text()";
 	private static final String DESCRIPTION = "description/text()";
 	//private static final String THUMBNAIL = "enclosure/@url";
-	// 获取img标签正则
+	// 鑾峰彇img鏍囩姝ｅ垯
 	private static final String IMGURL_REG = "<img.*src=(.*?)[^>]*?>";
-	// 获取src路径的正则
+	// 鑾峰彇src璺緞鐨勬鍒�	
 	private static final String IMGSRC_REG = "http:\"?(.*?)(\"|>|\\s+)";
 	
-	public ArrayList<NewsBrief> getNewsList(String rssString) throws XPathExpressionException{
-		ArrayList<NewsBrief> mlist = new ArrayList<NewsBrief>();
-		if(rssString == "" || null == rssString){return mlist;}
+	public void getNewsList(String rssString,ArrayList<NewsBrief> mlist) throws XPathExpressionException{
+		//ArrayList<NewsBrief> mlist = new ArrayList<NewsBrief>();
+		if(rssString == "" || null == rssString){return;}
 		
 		InputSource is = new InputSource(new StringReader(rssString));
 		
 		NodeList nodes = getNotes(is);
 		String thumbnail = null;
+		int count = 0;
 		for(int n = 0; n<nodes.getLength();n++){
 			Node node = nodes.item(n);
 			thumbnail = getThumbnail(node);
@@ -56,9 +59,10 @@ public class RssParser {
 			newsBrief.setSource(getSource(node));
 			newsBrief.setDescription(getDescription(node));
 			mlist.add(newsBrief);
+			if(++count>=NEWS_NUM){
+				break;
+			}
 		}
-		
-		return mlist;
 	}
 	
 	
