@@ -3,17 +3,16 @@ package main;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.xml.xpath.XPathExpressionException;
-
+import atg.taglib.json.util.JSONArray;
+import atg.taglib.json.util.JSONException;
+import atg.taglib.json.util.JSONObject;
 import objects.NewsBrief;
-import sun.util.logging.resources.logging;
 import tools.RssParser;
 
 public class MainOperation {
@@ -21,16 +20,16 @@ public class MainOperation {
 	private final int TITTLE_TATTLE = 100;
 	private RssParser rssParser;
 	private String[] TITTLE_TATTLE_URL = {"http://www.nbweekly.com/rss/smw/","http://9.douban.com/rss/life"};
-	private ArrayList<NewsBrief> tittle_tattle;
+	private static String tittle_tattle_jsonString;
 	
 	public MainOperation(){
 		rssParser = new RssParser();
-		tittle_tattle = new ArrayList<NewsBrief>();
+		//tittle_tattle = new ArrayList<NewsBrief>();
 	}
 	
-	public ArrayList<NewsBrief> getNewsList(int newsType){
+	public String getNewsList(int newsType){
 		switch(newsType){
-		case TITTLE_TATTLE: return tittle_tattle;
+		case TITTLE_TATTLE: return tittle_tattle_jsonString;
 		}
 
 		return null;
@@ -50,25 +49,24 @@ public class MainOperation {
 	private void getTittle_TattleNewsList(){
 		//System.out.println("getTittle_TattleNewsList");
 		ArrayList<NewsBrief> cacheList = new ArrayList<NewsBrief>();
-		if(getNewsList(TITTLE_TATTLE_URL,cacheList)){
-			//tittle_tattle = 
+		try {
+			getNewsList(TITTLE_TATTLE_URL,cacheList);
+			tittle_tattle_jsonString = newsListToJson(cacheList);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		System.out.println("tittle_tattle.size:"+tittle_tattle.size());
+			
+		
+		//System.out.println("tittle_tattle.size:"+tittle_tattle.size());
 	}
 
-	private boolean getNewsList(String[] urls,ArrayList<NewsBrief> newsList){
+	private void getNewsList(String[] urls,ArrayList<NewsBrief> newsList) throws Exception{
 		for(int n=0;n<urls.length;n++){
-			try {
 			    String rssString = getRssString(TITTLE_TATTLE_URL[n]);
 			//System.out.println("rssString------------:"+rssString);
 				rssParser.getNewsList(rssString, newsList);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return false;
-			}
 		}
-		return true;
 	}
 	
 	private String getRssString(String urlPath) throws Exception{
@@ -88,6 +86,21 @@ public class MainOperation {
 	}
 
 
+	
+	private String newsListToJson(ArrayList<NewsBrief> newsList) throws JSONException{
+		JSONArray jsonArray = new JSONArray();
+		for(NewsBrief news : newsList){
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("title", news.getTitle());
+			jsonObject.put("url", news.getUrl());
+			jsonObject.put("source", news.getSource());
+			jsonObject.put("thumbnail", news.getThumbnail());
+			jsonObject.put("description", news.getDescription());
+			jsonArray.add(jsonObject);
+		}
+		return jsonArray.toString();
+	}
+	
 //	private class GetNewsThread extends Thread{
 //
 //		@Override
