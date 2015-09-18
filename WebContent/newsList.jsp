@@ -4,14 +4,29 @@
 <%@page contentType="text/html"%>
 <%@page pageEncoding="GBK"%>
 <%@page import="java.util.*"%>
-
+<%@page import="java.io.BufferedReader"%>
+<%@page import="atg.taglib.json.util.JSONObject"%>
 <jsp:useBean id="mainOperation" class="main.MainOperation" scope="page" />
 <jsp:setProperty name="mainOperation" property="*" />
 
 <%
 	request.setCharacterEncoding("utf8");
 	response.setCharacterEncoding("utf8");
-	int newsType = Integer.parseInt(request.getParameter("newsType"));
+	
+	StringBuffer requestJson = new StringBuffer();
+	String line = null;
+	int newsType = 0;
+	try {
+		BufferedReader reader = request.getReader();
+		while ((line = reader.readLine()) != null) {
+			requestJson.append(line);
+		}
+		System.out.println("string:"+requestJson.toString());
+		JSONObject jsonObject = new JSONObject(requestJson.toString());
+		newsType = Integer.parseInt(jsonObject.getString("newsType"));
+	}catch(Exception e){
+		e.printStackTrace();
+	}
 	System.out.println("newsType:" + newsType);
 	String newsList = mainOperation.getNewsList(newsType);
 	System.out.println("newsList:" + newsList);
