@@ -32,14 +32,3 @@
 	System.out.println("newsList:" + newsList);
 %>
 <%=newsList%>
-<!-- 
-<json:array name="newsList" var="news" items="${newsList}">
-	<json:object>
-		<json:property name="title" value="${news.getTitle()}" />
-		<json:property name="url" value="${news.getUrl()}" />
-		<json:property name="source" value="${news.getSource()}" />
-		<json:property name="thumbnail" value="${news.getThumbnail()}" />
-		<json:property name="description" value="${news.getDescription()}" />
-	</json:object>
--->
-</json:array>

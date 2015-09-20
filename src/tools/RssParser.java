@@ -99,18 +99,18 @@ public class RssParser {
 		return thumbnail;
 	}
 	
-	private String getThumbnailFromHtml(String newsLink){
-		String thumbnail = null;
-		try {
-			URL uri = new URL(newsLink);
-			String htmlString = new String(readStream(uri.openStream()));
-			thumbnail = getImageUrl(htmlString);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		return thumbnail;
-	}
+//	private String getThumbnailFromHtml(String newsLink){
+//		String thumbnail = null;
+//		try {
+//			URL uri = new URL(newsLink);
+//			String htmlString = new String(readStream(uri.openStream()));
+//			thumbnail = getImageUrl(htmlString);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		
+//		return thumbnail;
+//	}
 	
 	private String getImageUrl(String HTML) {
 		String imgUrl = null;
